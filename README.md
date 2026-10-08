@@ -1,17 +1,22 @@
-# v2rayNG
+# v2rayNG Plus
 
-A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
+An enhanced V2Ray / Xray client for Android with side-by-side installation support (`com.v2ray.angplus`), two-phase smart speed testing, dual download/upload benchmarking, and official release signing.
 
 [![API](https://img.shields.io/badge/API-24%2B-yellow.svg?style=flat)](https://developer.android.com/about/versions/lollipop)
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-2.4.0-blue.svg)](https://kotlinlang.org)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/2dust/v2rayNG)](https://github.com/2dust/v2rayNG/commits/master)
-[![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayng/badge)](https://www.codefactor.io/repository/github/2dust/v2rayng)
-[![GitHub Releases](https://img.shields.io/github/downloads/2dust/v2rayNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
-[![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/v2rayn)
+[![GitHub Releases](https://img.shields.io/github/downloads/armanpier/v2rayNG-Plus/latest/total?logo=github)](https://github.com/armanpier/v2rayNG-Plus/releases)
 
 ---
 
 ## Features / 特性
+
+### Coexistence & Release Signing / 共存安装与正式签名
+- **Side-by-Side Coexistence / 独立共存安装**:
+  - Uses independent package name `com.v2ray.angplus`. You can install v2rayNG Plus alongside the official v2rayNG without uninstalling or overriding the original app.
+  - 采用独立的包名 `com.v2ray.angplus`，无需卸载官方 v2rayNG 即可双开并存安装与独立运行。
+- **Release Signed & Play Protect Clean / 正式密钥签名 & 规避报毒**:
+  - Release APKs are signed with APK Signature Schemes v2/v3, eliminating Google Play Protect warnings and debug mode restrictions.
+  - 采用正式发行证书与 v2/v3 签名方案，解除 Google Play 保护机制的安全未知警告与调试包限制。
 
 ### Smart Testing & Performance / 智能测速与性能
 - **Two-Phase Smart Speed Test / 双阶段智能测速**:
@@ -48,7 +53,7 @@ Download the latest release here:
 
 在这里下载最新版本：
 
-[https://github.com/2dust/v2rayNG/releases](https://github.com/2dust/v2rayNG/releases)
+[https://github.com/armanpier/v2rayNG-Plus/releases](https://github.com/armanpier/v2rayNG-Plus/releases)
 
 > [!TIP]
 > v2rayNG is the mobile version. For the desktop version, please visit the v2rayN \
