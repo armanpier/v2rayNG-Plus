@@ -180,6 +180,7 @@ fun SettingsScreen(
     var delayTestUrl by rememberMmkvString(AppConfig.PREF_DELAY_TEST_URL, "")
     var speedTestUrl by rememberMmkvString(AppConfig.PREF_SPEED_TEST_URL, "")
     var speedTestTimeout by rememberMmkvString(AppConfig.PREF_SPEED_TEST_TIMEOUT, "")
+    var speedTestPayloadSize by rememberMmkvString(AppConfig.PREF_SPEED_TEST_PAYLOAD_SIZE, AppConfig.DEFAULT_SPEED_TEST_PAYLOAD_SIZE.toString())
     var realPingConcurrency by rememberMmkvString(AppConfig.PREF_REAL_PING_CONCURRENCY, "16")
     var ipApiUrl by rememberMmkvString(AppConfig.PREF_IP_API_URL, "")
 
@@ -668,6 +669,13 @@ fun SettingsScreen(
                     value = speedTestTimeout,
                     keyboardNumber = true,
                     onValueChanged = { speedTestTimeout = it }
+                )
+                SettingsListItem(
+                    title = stringResource(R.string.title_pref_speed_test_payload_size),
+                    entries = listOf("5 MB", "10 MB", "25 MB", "50 MB"),
+                    values = listOf("5", "10", "25", "50"),
+                    selectedValue = speedTestPayloadSize,
+                    onSelected = { speedTestPayloadSize = it }
                 )
                 SettingsEditItem(
                     title = stringResource(R.string.title_pref_real_ping_concurrency),

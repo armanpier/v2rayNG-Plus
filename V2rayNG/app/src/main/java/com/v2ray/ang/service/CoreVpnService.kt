@@ -87,14 +87,21 @@ class CoreVpnService : VpnService(), ServiceControl {
             return START_NOT_STICKY
         }
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received, systemVpnStart=$isSystemVpnStart")
-        if (!setupVpnService()) {
+        try {
+            if (!setupVpnService()) {
+                unlockStart()
+                // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            startService()
+            return START_STICKY
+        } catch (t: Throwable) {
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Exception during onStartCommand", t)
             unlockStart()
-            // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
-            stopSelf()
+            stopAllService()
             return START_NOT_STICKY
         }
-        startService()
-        return START_STICKY
     }
 
     override fun getService(): Service {
@@ -102,18 +109,26 @@ class CoreVpnService : VpnService(), ServiceControl {
     }
 
     override fun startService() {
-        if (!::mInterface.isInitialized) {
-            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
-            return
-        }
-        if (!CoreServiceManager.startCoreLoop(mInterface)) {
-            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
-            stopAllService()
-            return
-        }
+        try {
+            if (!::mInterface.isInitialized) {
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
+                unlockStart()
+                stopAllService()
+                return
+            }
+            if (!CoreServiceManager.startCoreLoop(mInterface)) {
+                LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
+                stopAllService()
+                return
+            }
 
-        // Start LAN sharing if enabled in settings
-        RootLanSharing.startClientSharing(this)
+            // Start LAN sharing if enabled in settings
+            RootLanSharing.startClientSharing(this)
+        } catch (t: Throwable) {
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Exception in startService", t)
+            unlockStart()
+            stopAllService()
+        }
     }
 
     override fun stopService() {

@@ -244,6 +244,7 @@
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_speed_test_url">真連接測速 URL</string>
     <string name="title_pref_speed_test_timeout">測速逾時時間（秒）</string>
+    <string name="title_pref_speed_test_payload_size">測速數據包大小</string>
     <string name="title_pref_real_ping_concurrency">同時執行的真實延遲測試數</string>
 
     <string name="title_pref_ip_api_url">目前連線資訊測試 URL</string>
@@ -349,9 +350,12 @@
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
     <string name="title_real_ping_all_server">測試真連接延遲</string>
     <string name="title_real_speed_all_server">測試真連接速度</string>
+    <string name="title_smart_speed_test">智能測速 (前15個)</string>
     <string name="title_speed_test">測速</string>
+    <string name="title_stop_testing">停止測試</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依測試結果排序</string>
+    <string name="title_sort_by_download_speed">依下載速度排序</string>
     <string name="title_filter_config">篩選設定</string>
     <string name="filter_config_all">所有</string>
     <string name="summary_scan_qrcode">點一下螢幕以開啟相機並掃描</string>

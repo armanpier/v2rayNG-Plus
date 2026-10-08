@@ -397,6 +397,23 @@ object SettingsManager {
     }
 
     /**
+     * Get speed test payload size in megabytes.
+     * @return Payload size in MB (5, 10, 25, 50, default 10).
+     */
+    fun getSpeedTestPayloadSize(): Int {
+        val value = MmkvManager.decodeSettingsString(AppConfig.PREF_SPEED_TEST_PAYLOAD_SIZE)?.toIntOrNull()
+            ?: AppConfig.DEFAULT_SPEED_TEST_PAYLOAD_SIZE
+        return if (value in listOf(5, 10, 25, 50)) value else AppConfig.DEFAULT_SPEED_TEST_PAYLOAD_SIZE
+    }
+
+    /**
+     * Sets speed test payload size in megabytes.
+     */
+    fun setSpeedTestPayloadSize(sizeMb: Int) {
+        MmkvManager.encodeSettings(AppConfig.PREF_SPEED_TEST_PAYLOAD_SIZE, sizeMb.toString())
+    }
+
+    /**
      * Get real ping concurrency.
      * @return The number of concurrent real-ping tests (clamped to 1..64).
      */

@@ -496,12 +496,13 @@ object MmkvManager {
      * @param guid The server GUID.
      * @param speed The formatted speed test result (e.g. "12.5 MB/s").
      */
-    fun encodeServerTestSpeed(guid: String, speed: String) {
+    fun encodeServerTestSpeed(guid: String, speed: String, uploadSpeed: String = "") {
         if (guid.isBlank()) {
             return
         }
         val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
         aff.testSpeed = speed
+        aff.testUploadSpeed = uploadSpeed
         serverAffStorage.encode(guid, JsonUtil.toJson(aff))
     }
 
@@ -515,6 +516,22 @@ object MmkvManager {
             decodeServerAffiliationInfo(key)?.let { aff ->
                 aff.testDelayMillis = 0
                 aff.testSpeed = ""
+                aff.testUploadSpeed = ""
+                serverAffStorage.encode(key, JsonUtil.toJson(aff))
+            }
+        }
+    }
+
+    /**
+     * Clears speed results without clearing latency delay results.
+     *
+     * @param keys The list of server GUIDs.
+     */
+    fun clearAllTestSpeedResults(keys: List<String>?) {
+        keys?.forEach { key ->
+            decodeServerAffiliationInfo(key)?.let { aff ->
+                aff.testSpeed = ""
+                aff.testUploadSpeed = ""
                 serverAffStorage.encode(key, JsonUtil.toJson(aff))
             }
         }

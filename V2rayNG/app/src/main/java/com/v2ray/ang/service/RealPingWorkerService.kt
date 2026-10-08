@@ -67,17 +67,19 @@ class RealPingWorkerService(
                 try {
                     val result: Long
                     var speed = ""
+                    var uploadSpeed = ""
                     if (isSpeedTest) {
                         val speedResult = startRealSpeedTest(guid)
-                        result = speedResult.first
-                        speed = speedResult.second
+                        result = speedResult.delayMillis
+                        speed = speedResult.downloadSpeed
+                        uploadSpeed = speedResult.uploadSpeed
                     } else if (onlyTcp) {
                         result = startTcping(guid)
                     } else {
                         result = startRealPing(guid)
                     }
                     if (scope.isActive) {
-                        onEvent(RealPingEvent.Result(guid, result, speed))
+                        onEvent(RealPingEvent.Result(guid, result, speed, uploadSpeed))
                     }
                 } catch (_: Throwable) {
                     // ignore
@@ -166,8 +168,14 @@ class RealPingWorkerService(
         return retFailure
     }
 
-    private suspend fun startRealSpeedTest(guid: String): Pair<Long, String> {
-        val retFailure = -1L to ""
+    private data class RealPingSpeedResult(
+        val delayMillis: Long,
+        val downloadSpeed: String = "",
+        val uploadSpeed: String = ""
+    )
+
+    private suspend fun startRealSpeedTest(guid: String): RealPingSpeedResult {
+        val retFailure = RealPingSpeedResult(delayMillis = -1L, downloadSpeed = "", uploadSpeed = "")
         val delay = startRealPing(guid)
         if (delay <= 0L) {
             return retFailure
@@ -175,7 +183,7 @@ class RealPingWorkerService(
         val freePort = SpeedtestManager.findFreePort()
         val configResult = CoreConfigManager.getV2rayConfigForRealSpeedtest(context, guid, freePort)
         if (!configResult.status) {
-            return delay to ""
+            return RealPingSpeedResult(delayMillis = delay, downloadSpeed = "", uploadSpeed = "")
         }
         var controller: CoreController? = null
         return try {
@@ -186,16 +194,20 @@ class RealPingWorkerService(
             }
             controller = CoreNativeManager.newCoreController(callbackHandler)
             controller.startLoop(configResult.content, 0)
-            val speed = SpeedtestManager.testDownloadSpeed(
+            val speedResult = SpeedtestManager.testSpeed(
                 proxyPort = freePort,
                 isSocks = true,
-                testUrl = SettingsManager.getSpeedTestUrl(),
+                payloadSizeMb = SettingsManager.getSpeedTestPayloadSize(),
                 timeoutSeconds = SettingsManager.getSpeedTestTimeout(),
                 isCancelled = { !scope.isActive }
             )
-            delay to speed
+            RealPingSpeedResult(
+                delayMillis = delay,
+                downloadSpeed = speedResult.downloadSpeed,
+                uploadSpeed = speedResult.uploadSpeed
+            )
         } catch (_: Throwable) {
-            delay to ""
+            RealPingSpeedResult(delayMillis = delay, downloadSpeed = "", uploadSpeed = "")
         } finally {
             try {
                 controller?.stopLoop()

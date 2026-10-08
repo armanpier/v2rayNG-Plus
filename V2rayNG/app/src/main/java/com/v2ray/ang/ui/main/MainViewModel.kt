@@ -52,7 +52,8 @@ private fun applyTestResults(
     } else {
         server.copy(
             testDelayMillis = res.delayMillis,
-            testSpeed = if (res.speed.isNotEmpty()) res.speed else server.testSpeed
+            testSpeed = if (res.speed.isNotEmpty()) res.speed else server.testSpeed,
+            testUploadSpeed = if (res.uploadSpeed.isNotEmpty()) res.uploadSpeed else server.testUploadSpeed
         )
     }
 }
@@ -67,7 +68,8 @@ private fun applyTestResultsToRows(
     } else {
         row.copy(
             testDelayMillis = res.delayMillis,
-            testSpeed = if (res.speed.isNotEmpty()) res.speed else row.testSpeed
+            testSpeed = if (res.speed.isNotEmpty()) res.speed else row.testSpeed,
+            testUploadSpeed = if (res.uploadSpeed.isNotEmpty()) res.uploadSpeed else row.testUploadSpeed
         )
     }
 }
@@ -87,7 +89,8 @@ class MainViewModel(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
             confirmRemove = dataSource.getConfirmRemove(),
-            doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
+            doubleColumnDisplay = dataSource.getDoubleColumnDisplay(),
+            speedTestPayloadSize = dataSource.getSpeedTestPayloadSize()
         )
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -114,6 +117,12 @@ class MainViewModel(
 
     private val testRequests = MainTestRequests()
     private var bulkTestJob: Job? = null
+    private enum class SmartSpeedPhase {
+        DELAY_TRIAGE,
+        SPEED_MEASUREMENT
+    }
+    @Volatile
+    private var currentSmartSpeedPhase: SmartSpeedPhase? = null
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
@@ -182,6 +191,7 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigCancelled -> {
+                currentSmartSpeedPhase = null
                 if (testRequests.completeBulk(event.requestId) != null) {
                     cancelPendingTestResults()
                     resetTestStatus()
@@ -239,7 +249,10 @@ class MainViewModel(
     private fun formatConnectionTestResult(result: ConnectionTestResult): String {
         val status = if (result.delayMillis >= 0) {
             val delay = dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
-            val speedPart = if (!result.downloadSpeed.isNullOrBlank()) " | ${result.downloadSpeed}" else ""
+            val speedPart = buildString {
+                if (!result.downloadSpeed.isNullOrBlank()) append(" | ↓ ${result.downloadSpeed}")
+                if (!result.uploadSpeed.isNullOrBlank()) append(" ↑ ${result.uploadSpeed}")
+            }
             dataSource.getString(R.string.connection_test_available, delay) + speedPart
         } else {
             val detail = result.errorMessage.ifBlank {
@@ -286,12 +299,18 @@ class MainViewModel(
             MainAction.TestAllServers -> testAllRealPing(true)
             MainAction.TestRealAllServers -> testAllRealPing()
             MainAction.TestRealAllServersSpeed -> testAllRealSpeed()
+            MainAction.TestSmartSpeed -> testSmartSpeed()
             is MainAction.TestServerSpeed -> testServerRealSpeed(action.guid)
             MainAction.CancelTesting -> cancelAllPing()
+            is MainAction.SetSpeedTestPayloadSize -> {
+                dataSource.setSpeedTestPayloadSize(action.sizeMb)
+                _uiState.update { it.copy(speedTestPayloadSize = action.sizeMb) }
+            }
             MainAction.RemoveAllServers -> removeAllServerAsync()
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
             MainAction.RemoveInvalidServers -> removeInvalidServerAsync()
             MainAction.SortByTestResults -> sortByTestResultsAsync()
+            MainAction.SortBySpeed -> sortBySpeedAsync()
             MainAction.UpdateSubscriptions -> importConfigViaSub()
             MainAction.ExportAll -> exportAllAsync()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
@@ -345,7 +364,8 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 confirmRemove = dataSource.getConfirmRemove(),
-                doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
+                doubleColumnDisplay = dataSource.getDoubleColumnDisplay(),
+                speedTestPayloadSize = dataSource.getSpeedTestPayloadSize()
             )
         }
     }
@@ -360,7 +380,8 @@ class MainViewModel(
                 guid = guid,
                 profile = profile.copy(),
                 testDelayMillis = affiliation?.testDelayMillis ?: 0L,
-                testSpeed = affiliation?.testSpeed.orEmpty()
+                testSpeed = affiliation?.testSpeed.orEmpty(),
+                testUploadSpeed = affiliation?.testUploadSpeed.orEmpty()
             )
         }
 
@@ -720,6 +741,32 @@ class MainViewModel(
         subs.forEach { dataSource.sortByTestResultsForSub(it) }
     }
 
+    private fun sortBySpeedAsync() {
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    sortBySpeedInternal()
+                    cacheMutex.withLock { groupDataCache.clear() }
+                    setupGroupTab(forceRefresh = true)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Sort by speed failed", e)
+                    toastError(R.string.toast_failure)
+                }
+            }
+        }
+    }
+
+    private fun sortBySpeedInternal() {
+        val subs = if (uiState.value.selectedGroupId.isEmpty()) {
+            dataSource.getSubsList()
+        } else {
+            listOf(uiState.value.selectedGroupId)
+        }
+        subs.forEach { dataSource.sortBySpeedForSub(it) }
+    }
+
     fun subscriptionIdChanged(id: String) {
         if (_uiState.value.groups.none { it.id == id }) return
         mutableServerGroupState(id)
@@ -820,6 +867,7 @@ class MainViewModel(
     fun cancelAllPing() {
         bulkTestJob?.cancel()
         bulkTestJob = null
+        currentSmartSpeedPhase = null
         testRequests.cancelBulk()
         testRequests.invalidateCurrent()
         cancelPendingTestResults()
@@ -837,6 +885,17 @@ class MainViewModel(
         }
     }
 
+    fun testSmartSpeed() {
+        cancelAllPing()
+        val groupId = uiState.value.selectedGroupId
+        val servers = currentServers()
+        if (servers.isEmpty()) {
+            return
+        }
+        currentSmartSpeedPhase = SmartSpeedPhase.DELAY_TRIAGE
+        startBulkDelayTest(groupId, servers)
+    }
+
     fun testAllRealPing(onlyTcp: Boolean = false) {
         cancelAllPing()
         val groupId = uiState.value.selectedGroupId
@@ -844,6 +903,14 @@ class MainViewModel(
         if (servers.isEmpty()) {
             return
         }
+        startBulkDelayTest(groupId, servers, onlyTcp)
+    }
+
+    private fun startBulkDelayTest(
+        groupId: String,
+        servers: List<ServersCache>,
+        onlyTcp: Boolean = false
+    ) {
         val serverGuids = servers.map { it.guid }
         mutableServerGroupState(groupId).update { current ->
             current.copy(
@@ -894,16 +961,24 @@ class MainViewModel(
         if (servers.isEmpty()) {
             return
         }
+        startBulkSpeedTest(groupId, servers)
+    }
+
+    private fun startBulkSpeedTest(
+        groupId: String,
+        servers: List<ServersCache>
+    ) {
         val serverGuids = servers.map { it.guid }
+        val guidSet = serverGuids.toHashSet()
         mutableServerGroupState(groupId).update { current ->
             current.copy(
                 servers = current.servers.map { server ->
-                    if (server.testSpeed.isEmpty()) server
-                    else server.copy(testSpeed = "")
+                    if (server.guid in guidSet) server.copy(testSpeed = "", testUploadSpeed = "")
+                    else server
                 },
                 rows = current.rows.map { row ->
-                    if (row.testSpeed.isEmpty()) row
-                    else row.copy(testSpeed = "")
+                    if (row.guid in guidSet) row.copy(testSpeed = "", testUploadSpeed = "")
+                    else row
                 }
             )
         }
@@ -911,7 +986,7 @@ class MainViewModel(
         val message = TestServiceMessage(
             key = AppConfig.MSG_MEASURE_CONFIG_START,
             subscriptionId = groupId,
-            serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+            serverGuids = serverGuids,
             onlyTcp = false,
             isSpeedTest = true
         )
@@ -923,13 +998,12 @@ class MainViewModel(
         }
         bulkTestJob = viewModelScope.launch {
             withContext(ioDispatcher) {
-                dataSource.clearAllTestDelayResults(serverGuids)
-                val resetGuids = serverGuids.toHashSet()
+                dataSource.clearAllTestSpeedResults(serverGuids)
                 cacheMutex.withLock {
                     groupDataCache[groupId]?.let { cached ->
                         groupDataCache[groupId] = cached.map { server ->
-                            if (server.guid !in resetGuids || server.testSpeed.isEmpty()) server
-                            else server.copy(testSpeed = "")
+                            if (server.guid in guidSet) server.copy(testSpeed = "", testUploadSpeed = "")
+                            else server
                         }
                     }
                 }
@@ -944,10 +1018,10 @@ class MainViewModel(
         mutableServerGroupState(groupId).update { current ->
             current.copy(
                 servers = current.servers.map { server ->
-                    if (server.guid == guid) server.copy(testSpeed = "") else server
+                    if (server.guid == guid) server.copy(testSpeed = "", testUploadSpeed = "") else server
                 },
                 rows = current.rows.map { row ->
-                    if (row.guid == guid) row.copy(testSpeed = "") else row
+                    if (row.guid == guid) row.copy(testSpeed = "", testUploadSpeed = "") else row
                 }
             )
         }
@@ -967,11 +1041,11 @@ class MainViewModel(
         }
         bulkTestJob = viewModelScope.launch {
             withContext(ioDispatcher) {
-                dataSource.clearAllTestDelayResults(listOf(guid))
+                dataSource.clearAllTestSpeedResults(listOf(guid))
                 cacheMutex.withLock {
                     groupDataCache[groupId]?.let { cached ->
                         groupDataCache[groupId] = cached.map { server ->
-                            if (server.guid == guid) server.copy(testSpeed = "") else server
+                            if (server.guid == guid) server.copy(testSpeed = "", testUploadSpeed = "") else server
                         }
                     }
                 }
@@ -995,6 +1069,26 @@ class MainViewModel(
 
     private fun onTestsFinished(requestId: String) {
         if (testRequests.completeBulk(requestId) == null) return
+
+        if (currentSmartSpeedPhase == SmartSpeedPhase.DELAY_TRIAGE) {
+            val groupId = uiState.value.selectedGroupId
+            val currentGroupServers = mutableServerGroupState(groupId).value.servers
+            val responsiveServers = currentGroupServers
+                .filter { it.testDelayMillis > 0L }
+                .sortedBy { it.testDelayMillis }
+                .take(15)
+
+            if (responsiveServers.isNotEmpty()) {
+                currentSmartSpeedPhase = SmartSpeedPhase.SPEED_MEASUREMENT
+                startBulkSpeedTest(groupId, responsiveServers)
+                return
+            } else {
+                currentSmartSpeedPhase = null
+            }
+        } else if (currentSmartSpeedPhase == SmartSpeedPhase.SPEED_MEASUREMENT) {
+            currentSmartSpeedPhase = null
+        }
+
         resetTestStatus()
         viewModelScope.launch(ioDispatcher) {
             cacheMutex.withLock { groupDataCache.clear() }

@@ -419,21 +419,20 @@ private fun ServerListItem(
                     modifier = Modifier.clickable { actions.more(row.guid, row.profile) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (row.testSpeed.isNotBlank()) {
-                        Text(
-                            row.testSpeed,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colorPing,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    val parts = buildList {
                         if (testResult.isNotEmpty()) {
-                            Spacer(modifier = Modifier.width(6.dp))
+                            add(testResult)
+                        }
+                        if (row.testSpeed.isNotBlank()) {
+                            add("↓ ${row.testSpeed}")
+                        }
+                        if (row.testUploadSpeed.isNotBlank()) {
+                            add("↑ ${row.testUploadSpeed}")
                         }
                     }
-                    if (testResult.isNotEmpty()) {
+                    if (parts.isNotEmpty()) {
                         Text(
-                            testResult,
+                            text = parts.joinToString(" | "),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
                             maxLines = 1,

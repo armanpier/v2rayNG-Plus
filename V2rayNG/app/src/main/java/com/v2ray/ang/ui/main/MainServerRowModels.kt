@@ -14,6 +14,7 @@ internal data class ServerRowUiModel(
     val typeDescription: String,
     val testDelayMillis: Long,
     val testSpeed: String = "",
+    val testUploadSpeed: String = "",
     val subscriptionBadge: String,
 )
 
@@ -36,6 +37,7 @@ internal fun buildServerRowUiModel(
         typeDescription = serverProtocolDescription(profile),
         testDelayMillis = server.testDelayMillis,
         testSpeed = server.testSpeed,
+        testUploadSpeed = server.testUploadSpeed,
         subscriptionBadge = subscriptionRemarks.firstOrNull()?.toString().orEmpty(),
     )
 }

@@ -244,6 +244,7 @@
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_speed_test_url">真连接测速 URL</string>
     <string name="title_pref_speed_test_timeout">测速超时时间（秒）</string>
+    <string name="title_pref_speed_test_payload_size">测速数据包大小</string>
     <string name="title_pref_real_ping_concurrency">真连接延迟并发测试数</string>
 
     <string name="title_pref_ip_api_url">当前连接信息测试网址</string>
@@ -349,9 +350,12 @@
     <string name="title_ping_all_server">测试 TCP 延迟（TCPing）</string>
     <string name="title_real_ping_all_server">测试真连接延迟</string>
     <string name="title_real_speed_all_server">测试真连接速度</string>
+    <string name="title_smart_speed_test">智能测速 (前15个)</string>
     <string name="title_speed_test">测速</string>
+    <string name="title_stop_testing">停止测试</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
+    <string name="title_sort_by_download_speed">按下载速度排序</string>
     <string name="title_filter_config">过滤配置</string>
     <string name="filter_config_all">所有</string>
     <string name="summary_scan_qrcode">点击屏幕打开相机扫描</string>

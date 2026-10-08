@@ -7,4 +7,5 @@ data class RealPingResult(
     val guid: String,
     val delayMillis: Long,
     val speed: String = "",
+    val uploadSpeed: String = "",
 ) : Serializable

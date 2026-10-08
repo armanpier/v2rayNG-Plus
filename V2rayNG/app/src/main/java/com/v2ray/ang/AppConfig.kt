@@ -74,8 +74,12 @@ object AppConfig {
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_SPEED_TEST_URL = "pref_speed_test_url"
     const val PREF_SPEED_TEST_TIMEOUT = "pref_speed_test_timeout"
+    const val PREF_SPEED_TEST_PAYLOAD_SIZE = "pref_speed_test_payload_size"
     const val DEFAULT_SPEED_TEST_URL = "https://cachefly.cachefly.net/50mb.test"
     const val DEFAULT_SPEED_TEST_TIMEOUT = 10
+    const val DEFAULT_SPEED_TEST_PAYLOAD_SIZE = 10
+    const val CLOUDFLARE_SPEED_TEST_DOWN_URL = "https://speed.cloudflare.com/__down"
+    const val CLOUDFLARE_SPEED_TEST_UP_URL = "https://speed.cloudflare.com/__up"
     const val PREF_IP_API_URL = "pref_ip_api_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"

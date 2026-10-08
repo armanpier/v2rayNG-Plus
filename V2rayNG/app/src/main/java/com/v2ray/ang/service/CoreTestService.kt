@@ -153,13 +153,13 @@ class CoreTestService : Service() {
 
             is RealPingEvent.Result -> {
                 MmkvManager.encodeServerTestDelayMillis(event.guid, event.delayMillis)
-                if (event.speed.isNotEmpty()) {
-                    MmkvManager.encodeServerTestSpeed(event.guid, event.speed)
+                if (event.speed.isNotEmpty() || event.uploadSpeed.isNotEmpty()) {
+                    MmkvManager.encodeServerTestSpeed(event.guid, event.speed, event.uploadSpeed)
                 }
                 MessageHelper.sendMsg2UI(
                     this,
                     AppConfig.MSG_MEASURE_CONFIG_SUCCESS,
-                    RealPingResult(event.guid, event.delayMillis, event.speed),
+                    RealPingResult(event.guid, event.delayMillis, event.speed, event.uploadSpeed),
                     requestId,
                 )
             }

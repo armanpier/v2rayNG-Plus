@@ -596,6 +596,28 @@ object AngConfigManager {
     }
 
     /**
+     * Sorts servers strictly by measured download speed descending.
+     * Nodes without speed measurements or with failed tests are sent to the bottom.
+     */
+    fun sortBySpeedForSub(subId: String) {
+        val serverList = MmkvManager.decodeServerList(subId)
+        if (serverList.isEmpty()) return
+
+        val sorted = serverList.map { guid ->
+            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+            val speedBytes = SpeedtestManager.parseSpeedToBytes(aff?.testSpeed)
+            val delay = aff?.testDelayMillis ?: 0L
+            val effectiveDelay = if (delay <= 0L) Long.MAX_VALUE else delay
+            Triple(guid, speedBytes, effectiveDelay)
+        }.sortedWith(
+            compareByDescending<Triple<String, Double, Long>> { it.second }
+                .thenBy { it.third }
+        ).map { it.first }.toMutableList()
+
+        MmkvManager.encodeServerList(sorted, subId)
+    }
+
+    /**
      * Parses the configuration via a subscription.
      *
      * @param server The server string.

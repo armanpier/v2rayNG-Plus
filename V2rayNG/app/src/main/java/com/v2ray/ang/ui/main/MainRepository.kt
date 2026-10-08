@@ -125,6 +125,12 @@ class MainRepository(
     override fun isGroupAllDisplayEnabled(): Boolean =
         MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)
 
+    override fun getSpeedTestPayloadSize(): String =
+        SettingsManager.getSpeedTestPayloadSize().toString()
+
+    override fun setSpeedTestPayloadSize(size: String) =
+        SettingsManager.setSpeedTestPayloadSize(size.toIntOrNull() ?: AppConfig.DEFAULT_SPEED_TEST_PAYLOAD_SIZE)
+
     override fun getString(resId: Int): String = localizedContext.getString(resId)
 
     override fun getString(resId: Int, vararg formatArgs: Any): String =
@@ -180,8 +186,15 @@ class MainRepository(
     override fun clearAllTestDelayResults(guids: List<String>) =
         MmkvManager.clearAllTestDelayResults(guids)
 
+    override fun clearAllTestSpeedResults(guids: List<String>) =
+        MmkvManager.clearAllTestSpeedResults(guids)
+
     override fun sortByTestResultsForSub(subId: String) {
         AngConfigManager.sortByTestResultsForSub(subId)
+    }
+
+    override fun sortBySpeedForSub(subId: String) {
+        AngConfigManager.sortBySpeedForSub(subId)
     }
 
     override fun getSubsList(): List<String> = MmkvManager.decodeSubsList()

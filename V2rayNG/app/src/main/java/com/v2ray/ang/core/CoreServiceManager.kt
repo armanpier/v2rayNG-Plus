@@ -348,26 +348,30 @@ object CoreServiceManager {
             ensureActive()
             val endpoint = if (time >= 0) SpeedtestManager.getRemoteIPInfo() else null
             var downloadSpeed: String? = null
+            var uploadSpeed: String? = null
             if (time >= 0) {
                 val httpPort = SettingsManager.getHttpPort()
                 val socksPort = SettingsManager.getSocksPort()
-                val speed = if (httpPort > 0) {
-                    SpeedtestManager.testDownloadSpeed(
+                val speedRes = if (httpPort > 0) {
+                    SpeedtestManager.testSpeed(
                         proxyPort = httpPort,
                         isSocks = false,
                         timeoutSeconds = 5,
                         isCancelled = { !this@launch.isActive }
                     )
                 } else if (socksPort > 0) {
-                    SpeedtestManager.testDownloadSpeed(
+                    SpeedtestManager.testSpeed(
                         proxyPort = socksPort,
                         isSocks = true,
                         timeoutSeconds = 5,
                         isCancelled = { !this@launch.isActive }
                     )
-                } else ""
-                if (speed.isNotEmpty()) {
-                    downloadSpeed = speed
+                } else SpeedtestManager.SpeedTestResult()
+                if (speedRes.downloadSpeed.isNotEmpty()) {
+                    downloadSpeed = speedRes.downloadSpeed
+                }
+                if (speedRes.uploadSpeed.isNotEmpty()) {
+                    uploadSpeed = speedRes.uploadSpeed
                 }
             }
             val result = ConnectionTestResult(
@@ -376,6 +380,7 @@ object CoreServiceManager {
                 country = endpoint?.country,
                 ipAddress = endpoint?.ipAddress,
                 downloadSpeed = downloadSpeed,
+                uploadSpeed = uploadSpeed,
             )
             withContext(Dispatchers.Main.immediate) {
                 if (isRunning()) {

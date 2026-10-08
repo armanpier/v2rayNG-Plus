@@ -34,9 +34,13 @@ enum class MainMoreMenuAction(@StringRes val labelRes: Int) {
     ExportAll(R.string.title_export_all),
     LocateSelected(R.string.title_locate_selected_config),
     SortByTestResults(R.string.title_sort_by_test_results),
+    SortBySpeed(R.string.title_sort_by_download_speed),
     TestAll(R.string.title_ping_all_server),
     TestAllRealPing(R.string.title_real_ping_all_server),
+    TestSmartSpeed(R.string.title_smart_speed_test),
     TestAllRealSpeed(R.string.title_real_speed_all_server),
+    SpeedTestPayloadSize(R.string.title_pref_speed_test_payload_size),
+    CancelTesting(R.string.title_stop_testing),
     UpdateSubscriptions(R.string.title_sub_update)
 }
 

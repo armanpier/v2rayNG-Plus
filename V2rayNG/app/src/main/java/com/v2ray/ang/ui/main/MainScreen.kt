@@ -28,9 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.ui.res.stringResource
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
+import com.v2ray.ang.ui.compose.SelectListDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -58,6 +65,27 @@ fun MainScreen(
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
+    var showPayloadSizeDialog by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val cancelLabel = stringResource(R.string.action_cancel)
+    val testingLabel = stringResource(R.string.connection_test_testing)
+
+    LaunchedEffect(uiState.isTesting, displayText) {
+        if (uiState.isTesting) {
+            val message = if (displayText.isNotBlank()) displayText else testingLabel
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = cancelLabel,
+                duration = SnackbarDuration.Indefinite
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                onAction(MainAction.CancelTesting)
+            }
+        } else {
+            snackbarHostState.currentSnackbarData?.dismiss()
+        }
+    }
+
     var showRemoveConfirm by rememberSaveable(stateSaver = ServerDeleteTarget.Saver) {
         mutableStateOf<ServerDeleteTarget?>(null)
     }
@@ -136,6 +164,21 @@ fun MainScreen(
     if (shareQRCodeBitmap != null) {
         QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
     }
+    if (showPayloadSizeDialog) {
+        val payloadOptions = listOf("5", "10", "25", "50")
+        SelectListDialog(
+            title = stringResource(R.string.title_pref_speed_test_payload_size),
+            options = payloadOptions,
+            optionText = { "$it MB" },
+            selectedOption = uiState.speedTestPayloadSize,
+            showRadio = true,
+            onSelected = { size ->
+                onAction(MainAction.SetSpeedTestPayloadSize(size))
+                showPayloadSizeDialog = false
+            },
+            onDismiss = { showPayloadSizeDialog = false }
+        )
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -151,6 +194,7 @@ fun MainScreen(
     ) {
         Scaffold(
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 MainTopBar(
                     isLoading = isLoading,
@@ -177,9 +221,13 @@ fun MainScreen(
                             MainMoreMenuAction.ExportAll -> onAction(MainAction.ExportAll)
                             MainMoreMenuAction.LocateSelected -> onAction(MainAction.LocateSelectedServer)
                             MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)
+                            MainMoreMenuAction.SortBySpeed -> onAction(MainAction.SortBySpeed)
                             MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
                             MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
+                            MainMoreMenuAction.TestSmartSpeed -> onAction(MainAction.TestSmartSpeed)
                             MainMoreMenuAction.TestAllRealSpeed -> onAction(MainAction.TestRealAllServersSpeed)
+                            MainMoreMenuAction.SpeedTestPayloadSize -> showPayloadSizeDialog = true
+                            MainMoreMenuAction.CancelTesting -> onAction(MainAction.CancelTesting)
                             MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
                         }
                     }

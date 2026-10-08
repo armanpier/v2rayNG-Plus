@@ -9,4 +9,5 @@ data class ConnectionTestResult(
     val country: String? = null,
     val ipAddress: String? = null,
     val downloadSpeed: String? = null,
+    val uploadSpeed: String? = null,
 ) : Serializable

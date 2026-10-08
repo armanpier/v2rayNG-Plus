@@ -244,6 +244,7 @@
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_speed_test_url">Real speed test URL</string>
     <string name="title_pref_speed_test_timeout">Speed test timeout (s)</string>
+    <string name="title_pref_speed_test_payload_size">Speed test payload size</string>
     <string name="title_pref_real_ping_concurrency">Concurrent real-delay tests</string>
 
     <string name="title_pref_ip_api_url">Current connection info test URL</string>
@@ -349,9 +350,12 @@
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
     <string name="title_real_ping_all_server">Test real delays</string>
     <string name="title_real_speed_all_server">Test real speeds</string>
+    <string name="title_smart_speed_test">Smart speed test (top 15)</string>
     <string name="title_speed_test">Speed test</string>
+    <string name="title_stop_testing">Stop testing</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sort by test results</string>
+    <string name="title_sort_by_download_speed">Sort by download speed</string>
     <string name="title_filter_config">Filter configs</string>
     <string name="filter_config_all">All</string>
     <string name="summary_scan_qrcode">Tap the screen to open the camera and scan</string>

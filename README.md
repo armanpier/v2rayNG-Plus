@@ -11,6 +11,37 @@ A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-cor
 
 ---
 
+## Features / 特性
+
+### Smart Testing & Performance / 智能测速与性能
+- **Two-Phase Smart Speed Test / 双阶段智能测速**:
+  - Phase 1: Real latency (RTT) triage across all nodes.
+  - Phase 2: Full throughput testing executed strictly on the top 15 fastest responsive nodes, saving bandwidth, battery, and time.
+  - 第一阶段：对全部节点进行真实延迟测试（RTT）；
+  - 第二阶段：自动筛选出响应最快的前 15 个节点进行完整吞吐量测速，大幅节省流量与电量。
+- **Dual Download & Upload Speed Testing / 双向下载与上传测速**:
+  - Measures download throughput via chunked streaming against Cloudflare CDN endpoints (`↓ [Download]`).
+  - Measures upload throughput via an in-memory zero-allocation byte stream (`↑ [Upload]`).
+  - 基于 Cloudflare CDN 测量实时下载带宽与内存零分配的上传吞吐量。
+- **Configurable Test Payload Size / 可配置测速包大小**:
+  - Choose between 5 MB, 10 MB (default), 25 MB, and 50 MB payload sizes via menu dialog or settings. Upload payload is scaled dynamically.
+  - 支持在菜单与设置中选择 5 MB、10 MB（默认）、25 MB、50 MB 测速数据包，上传大小同步动态适配。
+- **Instant Test Cancellation / 瞬时中断与取消**:
+  - Interactive bottom banner with CANCEL button and top-menu action for instant cancellation of ongoing tests without blocking the app.
+  - 测速期间底部常驻可交互取消提示条与顶部菜单项，毫秒级终止网络流，流畅不卡顿。
+- **Sort by Download Speed / 按下载速度排序**:
+  - Automatically sorts servers descending by measured throughput, keeping unmeasured or dead nodes at the bottom.
+  - 一键按下载吞吐量降序排列配置，未测或失效节点自动沉底。
+- **Enhanced Node Cards / 丰富节点信息展示**:
+  - Visual status displays `[Delay] | ↓ [Download] | ↑ [Upload]` in real-time.
+  - 节点卡片清晰展示延迟、下载测速及上传测速数据。
+- **Stability & Deadlock Fixes / 稳定性与防死锁优化**:
+  - Isolated ephemeral speed test inbounds to avoid port 10808 collisions and socket handle exhaustion.
+  - Guaranteed `unlockStart()` on VPN service failures to eliminate service deadlocks.
+  - 测速端口与配置隔离，彻底解决物理设备端口冲突及 VPN 服务启停死锁问题。
+
+---
+
 ## Download / 下载
 
 Download the latest release here:

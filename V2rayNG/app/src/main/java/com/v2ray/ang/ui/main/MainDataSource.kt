@@ -21,6 +21,8 @@ interface MainDataSource : Closeable {
     fun getConfirmRemove(): Boolean
     fun getDoubleColumnDisplay(): Boolean
     fun isGroupAllDisplayEnabled(): Boolean
+    fun getSpeedTestPayloadSize(): String
+    fun setSpeedTestPayloadSize(size: String)
 
     fun getString(resId: Int): String
     fun getString(resId: Int, vararg formatArgs: Any): String
@@ -40,7 +42,9 @@ interface MainDataSource : Closeable {
     fun removeInvalidServersInGroup(groupId: String): Int
 
     fun clearAllTestDelayResults(guids: List<String>)
+    fun clearAllTestSpeedResults(guids: List<String>)
     fun sortByTestResultsForSub(subId: String)
+    fun sortBySpeedForSub(subId: String)
     fun getSubsList(): List<String>
 
     suspend fun importBatchConfig(

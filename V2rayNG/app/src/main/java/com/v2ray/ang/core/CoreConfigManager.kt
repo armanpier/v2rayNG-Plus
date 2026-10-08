@@ -99,8 +99,7 @@ object CoreConfigManager {
                 if (!customResult.status) return customResult
                 val json = JsonUtil.parseString(customResult.content)?.takeIf { it.isJsonObject }?.asJsonObject
                     ?: return customResult
-                val inboundsJson = json.get("inbounds")?.takeIf { it.isJsonArray }?.asJsonArray
-                    ?: JsonArray().also { json.add("inbounds", it) }
+                val inboundsJson = JsonArray()
                 val socksInbound = JsonObject().apply {
                     addProperty("tag", "socks-speedtest")
                     addProperty("port", socksPort)
@@ -112,6 +111,7 @@ object CoreConfigManager {
                     })
                 }
                 inboundsJson.add(socksInbound)
+                json.add("inbounds", inboundsJson)
                 return ConfigResult(true, guid, JsonUtil.toJsonPretty(json) ?: customResult.content)
             }
             val v2rayConfig = buildUnifiedConfig(configContext)

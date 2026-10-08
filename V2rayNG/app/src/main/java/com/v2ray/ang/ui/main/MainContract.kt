@@ -26,7 +26,8 @@ data class MainUiState(
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
-    val shareQRCodeBitmap: android.graphics.Bitmap? = null
+    val shareQRCodeBitmap: android.graphics.Bitmap? = null,
+    val speedTestPayloadSize: String = "10"
 )
 
 /**
@@ -40,12 +41,15 @@ sealed interface MainAction {
     data object TestAllServers : MainAction
     data object TestRealAllServers : MainAction
     data object TestRealAllServersSpeed : MainAction
+    data object TestSmartSpeed : MainAction
     data class TestServerSpeed(val guid: String) : MainAction
     data object CancelTesting : MainAction
+    data class SetSpeedTestPayloadSize(val sizeMb: String) : MainAction
     data object RemoveAllServers : MainAction
     data object RemoveDuplicateServers : MainAction
     data object RemoveInvalidServers : MainAction
     data object SortByTestResults : MainAction
+    data object SortBySpeed : MainAction
     data object UpdateSubscriptions : MainAction
     data object ExportAll : MainAction
 
