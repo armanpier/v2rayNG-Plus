@@ -242,6 +242,8 @@
 
     <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
+    <string name="title_pref_speed_test_url">عنوان URL لاختبار السرعة الحقيقية</string>
+    <string name="title_pref_speed_test_timeout">مهلة اختبار السرعة (بالثواني)</string>
     <string name="title_pref_real_ping_concurrency">اختبارات تأخير حقيقي متزامنة</string>
 
     <string name="title_pref_ip_api_url">عنوان URL لاختبار معلومات الاتصال الحالي</string>
@@ -346,6 +348,8 @@
     <string name="title_sub_update">تحديث الاشتراك</string>
     <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
     <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي</string>
+    <string name="title_real_speed_all_server">اختبار السرعة الفعلية</string>
+    <string name="title_speed_test">اختبار السرعة</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>

@@ -565,15 +565,33 @@ object AngConfigManager {
         val serverList = MmkvManager.decodeServerList(subId)
         if (serverList.isEmpty()) return
 
-        val sorted = serverList
-            .map { guid ->
-                val delay =
-                    MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
-                guid to if (delay <= 0L) Long.MAX_VALUE else delay
-            }
-            .sortedBy { it.second }
-            .map { it.first }
-            .toMutableList()
+        val hasAnySpeed = serverList.any { guid ->
+            val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+            !aff?.testSpeed.isNullOrBlank()
+        }
+
+        val sorted = if (hasAnySpeed) {
+            serverList.map { guid ->
+                val aff = MmkvManager.decodeServerAffiliationInfo(guid)
+                val speedBytes = SpeedtestManager.parseSpeedToBytes(aff?.testSpeed)
+                val delay = aff?.testDelayMillis ?: 0L
+                val effectiveDelay = if (delay <= 0L) Long.MAX_VALUE else delay
+                Triple(guid, speedBytes, effectiveDelay)
+            }.sortedWith(
+                compareByDescending<Triple<String, Double, Long>> { it.second }
+                    .thenBy { it.third }
+            ).map { it.first }.toMutableList()
+        } else {
+            serverList
+                .map { guid ->
+                    val delay =
+                        MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                    guid to if (delay <= 0L) Long.MAX_VALUE else delay
+                }
+                .sortedBy { it.second }
+                .map { it.first }
+                .toMutableList()
+        }
         MmkvManager.encodeServerList(sorted, subId)
     }
 

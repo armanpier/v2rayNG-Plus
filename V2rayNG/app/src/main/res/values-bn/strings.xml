@@ -242,6 +242,8 @@
 
     <string name="title_pref_delay_test_url">প্রকৃত বিলম্ব পরীক্ষার URL</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
+    <string name="title_pref_speed_test_url">প্রকৃত গতি পরীক্ষার URL</string>
+    <string name="title_pref_speed_test_timeout">গতি পরীক্ষার সময়সীমা (সেকেন্ড)</string>
     <string name="title_pref_real_ping_concurrency">একযোগে প্রকৃত বিলম্ব পরীক্ষা</string>
 
     <string name="title_pref_ip_api_url">বর্তমান সংযোগের তথ্য পরীক্ষার URL</string>
@@ -346,6 +348,8 @@
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
     <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
     <string name="title_real_ping_all_server">প্রকৃত বিলম্ব পরীক্ষা করুন</string>
+    <string name="title_real_speed_all_server">প্রকৃত গতি পরীক্ষা করুন</string>
+    <string name="title_speed_test">গতি পরীক্ষা</string>
     <string name="title_user_asset_setting">অ্যাসেট ফাইল</string>
     <string name="title_sort_by_test_results">টেস্ট ফলাফল দ্বারা সাজানো</string>
     <string name="title_filter_config">কনফিগারেশন ফাইল ফিল্টার করুন</string>

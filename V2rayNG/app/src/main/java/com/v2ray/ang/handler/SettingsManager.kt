@@ -378,6 +378,25 @@ object SettingsManager {
     }
 
     /**
+     * Get speed test URL.
+     * @return The speed test download URL.
+     */
+    fun getSpeedTestUrl(): String {
+        val custom = MmkvManager.decodeSettingsString(AppConfig.PREF_SPEED_TEST_URL)
+        return if (!custom.isNullOrBlank()) custom else AppConfig.DEFAULT_SPEED_TEST_URL
+    }
+
+    /**
+     * Get speed test timeout in seconds.
+     * @return Timeout in seconds (clamped to 3..60).
+     */
+    fun getSpeedTestTimeout(): Int {
+        val value = MmkvManager.decodeSettingsString(AppConfig.PREF_SPEED_TEST_TIMEOUT)?.toIntOrNull()
+            ?: AppConfig.DEFAULT_SPEED_TEST_TIMEOUT
+        return value.coerceIn(3, 60)
+    }
+
+    /**
      * Get real ping concurrency.
      * @return The number of concurrent real-ping tests (clamped to 1..64).
      */

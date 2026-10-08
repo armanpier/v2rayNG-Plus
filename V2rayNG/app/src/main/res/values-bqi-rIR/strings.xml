@@ -242,6 +242,8 @@
 
     <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
+    <string name="title_pref_speed_test_url">نشۊوی اینترنتی آزمایش سرعت واقعی</string>
+    <string name="title_pref_speed_test_timeout">مهلت زمووی آزمایش سرعت (ثانیه)</string>
     <string name="title_pref_real_ping_concurrency">تعداڌ هوم زمووی تست تئخیر واقعی</string>
 
     <string name="title_pref_ip_api_url">نشۊوی اینترنتی آزمایش دووسمندیا منپیز هیم سکویی</string>
@@ -346,6 +348,8 @@
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تئخیر واقعی</string>
+    <string name="title_real_speed_all_server">آزمایش سرعت واقعی</string>
+    <string name="title_speed_test">آزمایش سرعت</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>

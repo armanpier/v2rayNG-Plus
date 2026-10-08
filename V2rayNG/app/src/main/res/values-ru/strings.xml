@@ -242,6 +242,8 @@
 
     <string name="title_pref_delay_test_url">Сервис проверки реальной задержки</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
+    <string name="title_pref_speed_test_url">Сервис проверки реальной скорости</string>
+    <string name="title_pref_speed_test_timeout">Таймаут теста скорости (с)</string>
     <string name="title_pref_real_ping_concurrency">Параллельные тесты реальной задержки</string>
 
     <string name="title_pref_ip_api_url">Сервис проверки текущего соединения</string>
@@ -346,6 +348,8 @@
     <string name="title_sub_update">Обновить подписку</string>
     <string name="title_ping_all_server">Проверить TCP-задержку</string>
     <string name="title_real_ping_all_server">Проверить реальную задержку</string>
+    <string name="title_real_speed_all_server">Проверить реальную скорость</string>
+    <string name="title_speed_test">Тест скорости</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>

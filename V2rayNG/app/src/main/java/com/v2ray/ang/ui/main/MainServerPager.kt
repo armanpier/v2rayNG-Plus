@@ -415,13 +415,32 @@ private fun ServerListItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    testResult,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.clickable { actions.more(row.guid, row.profile) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (row.testSpeed.isNotBlank()) {
+                        Text(
+                            row.testSpeed,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colorPing,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        if (testResult.isNotEmpty()) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                        }
+                    }
+                    if (testResult.isNotEmpty()) {
+                        Text(
+                            testResult,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
     }

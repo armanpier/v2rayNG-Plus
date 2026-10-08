@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import libv2ray.CoreCallbackHandler
@@ -346,11 +347,35 @@ object CoreServiceManager {
 
             ensureActive()
             val endpoint = if (time >= 0) SpeedtestManager.getRemoteIPInfo() else null
+            var downloadSpeed: String? = null
+            if (time >= 0) {
+                val httpPort = SettingsManager.getHttpPort()
+                val socksPort = SettingsManager.getSocksPort()
+                val speed = if (httpPort > 0) {
+                    SpeedtestManager.testDownloadSpeed(
+                        proxyPort = httpPort,
+                        isSocks = false,
+                        timeoutSeconds = 5,
+                        isCancelled = { !this@launch.isActive }
+                    )
+                } else if (socksPort > 0) {
+                    SpeedtestManager.testDownloadSpeed(
+                        proxyPort = socksPort,
+                        isSocks = true,
+                        timeoutSeconds = 5,
+                        isCancelled = { !this@launch.isActive }
+                    )
+                } else ""
+                if (speed.isNotEmpty()) {
+                    downloadSpeed = speed
+                }
+            }
             val result = ConnectionTestResult(
                 delayMillis = time,
                 errorMessage = errorStr,
                 country = endpoint?.country,
                 ipAddress = endpoint?.ipAddress,
+                downloadSpeed = downloadSpeed,
             )
             withContext(Dispatchers.Main.immediate) {
                 if (isRunning()) {

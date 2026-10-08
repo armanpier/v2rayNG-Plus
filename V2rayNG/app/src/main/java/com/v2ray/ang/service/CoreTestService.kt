@@ -123,6 +123,7 @@ class CoreTestService : Service() {
                 context = this,
                 guids = guidsList,
                 onlyTcp = message.onlyTcp,
+                isSpeedTest = message.isSpeedTest,
                 onEvent = { event ->
                     if (activeWorkers.containsKey(worker)) {
                         handleWorkerEvent(event, message, requestId) { activeWorkers.remove(worker) }
@@ -152,10 +153,13 @@ class CoreTestService : Service() {
 
             is RealPingEvent.Result -> {
                 MmkvManager.encodeServerTestDelayMillis(event.guid, event.delayMillis)
+                if (event.speed.isNotEmpty()) {
+                    MmkvManager.encodeServerTestSpeed(event.guid, event.speed)
+                }
                 MessageHelper.sendMsg2UI(
                     this,
                     AppConfig.MSG_MEASURE_CONFIG_SUCCESS,
-                    RealPingResult(event.guid, event.delayMillis),
+                    RealPingResult(event.guid, event.delayMillis, event.speed),
                     requestId,
                 )
             }

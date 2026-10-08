@@ -36,6 +36,7 @@ enum class MainMoreMenuAction(@StringRes val labelRes: Int) {
     SortByTestResults(R.string.title_sort_by_test_results),
     TestAll(R.string.title_ping_all_server),
     TestAllRealPing(R.string.title_real_ping_all_server),
+    TestAllRealSpeed(R.string.title_real_speed_all_server),
     UpdateSubscriptions(R.string.title_sub_update)
 }
 
@@ -44,6 +45,7 @@ internal enum class ServerMenuAction(
     val isShareAction: Boolean,
     val supportsComplexProfiles: Boolean,
 ) {
+    SpeedTest(R.string.title_speed_test, isShareAction = false, supportsComplexProfiles = true),
     ShareQRCode(R.string.share_method_qrcode, isShareAction = true, supportsComplexProfiles = false),
     ShareClipboard(R.string.share_method_clipboard, isShareAction = true, supportsComplexProfiles = false),
     ShareFullContent(R.string.share_method_full_content, isShareAction = true, supportsComplexProfiles = true),
@@ -91,6 +93,7 @@ fun ShareMethodDialog(
         onSelected = { action ->
             onDismiss()
             when (action) {
+                ServerMenuAction.SpeedTest -> onAction(MainAction.TestServerSpeed(guid))
                 ServerMenuAction.ShareQRCode -> onAction(MainAction.ShareQRCode(guid))
                 ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(guid))
                 ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(guid))

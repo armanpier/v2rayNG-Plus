@@ -20,6 +20,8 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import libv2ray.CoreCallbackHandler
+import libv2ray.CoreController
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -46,10 +48,11 @@ class RealPingWorkerService(
     private val context: Context,
     private val guids: List<String>,
     private val onlyTcp: Boolean = false,
+    private val isSpeedTest: Boolean = false,
     private val onEvent: (RealPingEvent) -> Unit = {}
 ) {
     private val job = SupervisorJob()
-    private val concurrency = SettingsManager.getRealPingConcurrency()
+    private val concurrency = if (isSpeedTest) 1 else SettingsManager.getRealPingConcurrency()
     private val dispatcher = Executors.newFixedThreadPool(if (onlyTcp) concurrency * 2 else concurrency).asCoroutineDispatcher()
     private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
 
@@ -62,9 +65,19 @@ class RealPingWorkerService(
             scope.launch {
                 runningCount.incrementAndGet()
                 try {
-                    val result = if (onlyTcp) startTcping(guid) else startRealPing(guid)
+                    val result: Long
+                    var speed = ""
+                    if (isSpeedTest) {
+                        val speedResult = startRealSpeedTest(guid)
+                        result = speedResult.first
+                        speed = speedResult.second
+                    } else if (onlyTcp) {
+                        result = startTcping(guid)
+                    } else {
+                        result = startRealPing(guid)
+                    }
                     if (scope.isActive) {
-                        onEvent(RealPingEvent.Result(guid, result))
+                        onEvent(RealPingEvent.Result(guid, result, speed))
                     }
                 } catch (_: Throwable) {
                     // ignore
@@ -151,5 +164,43 @@ class RealPingWorkerService(
         }
 
         return retFailure
+    }
+
+    private suspend fun startRealSpeedTest(guid: String): Pair<Long, String> {
+        val retFailure = -1L to ""
+        val delay = startRealPing(guid)
+        if (delay <= 0L) {
+            return retFailure
+        }
+        val freePort = SpeedtestManager.findFreePort()
+        val configResult = CoreConfigManager.getV2rayConfigForRealSpeedtest(context, guid, freePort)
+        if (!configResult.status) {
+            return delay to ""
+        }
+        var controller: CoreController? = null
+        return try {
+            val callbackHandler = object : CoreCallbackHandler {
+                override fun startup(): Long = 0
+                override fun shutdown(): Long = 0
+                override fun onEmitStatus(status: Long, msg: String?): Long = 0
+            }
+            controller = CoreNativeManager.newCoreController(callbackHandler)
+            controller.startLoop(configResult.content, 0)
+            val speed = SpeedtestManager.testDownloadSpeed(
+                proxyPort = freePort,
+                isSocks = true,
+                testUrl = SettingsManager.getSpeedTestUrl(),
+                timeoutSeconds = SettingsManager.getSpeedTestTimeout(),
+                isCancelled = { !scope.isActive }
+            )
+            delay to speed
+        } catch (_: Throwable) {
+            delay to ""
+        } finally {
+            try {
+                controller?.stopLoop()
+            } catch (_: Throwable) {
+            }
+        }
     }
 }

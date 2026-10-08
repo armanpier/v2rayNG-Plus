@@ -84,6 +84,61 @@ object CoreConfigManager {
     }
 
     /**
+     * Build configuration for real download speed test with a local SOCKS inbound listener.
+     */
+    fun getV2rayConfigForRealSpeedtest(context: Context, guid: String, socksPort: Int): ConfigResult {
+        try {
+            val configContext = CoreConfigContextBuilder.build(context, guid)
+                ?: return ConfigResult(
+                    status = false,
+                    guid = guid,
+                    errorMessage = "Failed to build config context"
+                )
+            if (configContext.isCustom) {
+                val customResult = buildV2rayCustomConfig(configContext)
+                if (!customResult.status) return customResult
+                val json = JsonUtil.parseString(customResult.content)?.takeIf { it.isJsonObject }?.asJsonObject
+                    ?: return customResult
+                val inboundsJson = json.get("inbounds")?.takeIf { it.isJsonArray }?.asJsonArray
+                    ?: JsonArray().also { json.add("inbounds", it) }
+                val socksInbound = JsonObject().apply {
+                    addProperty("tag", "socks-speedtest")
+                    addProperty("port", socksPort)
+                    addProperty("listen", AppConfig.LOOPBACK)
+                    addProperty("protocol", "socks")
+                    add("settings", JsonObject().apply {
+                        addProperty("auth", "noauth")
+                        addProperty("udp", false)
+                    })
+                }
+                inboundsJson.add(socksInbound)
+                return ConfigResult(true, guid, JsonUtil.toJsonPretty(json) ?: customResult.content)
+            }
+            val v2rayConfig = buildUnifiedConfig(configContext)
+            postProcessForSpeedtest(v2rayConfig)
+            val inbound = V2rayConfig.InboundBean(
+                tag = "socks-speedtest",
+                port = socksPort,
+                protocol = "socks",
+                listen = AppConfig.LOOPBACK,
+                settings = V2rayConfig.InboundBean.InSettingsBean(
+                    auth = "noauth",
+                    udp = false
+                )
+            )
+            v2rayConfig.inbounds.add(inbound)
+            return toConfigResult(configContext, v2rayConfig)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to get V2ray config for real speedtest", e)
+            return ConfigResult(
+                status = false,
+                guid = guid,
+                errorMessage = "Failed to get V2ray config for real speedtest: ${e.message ?: e.javaClass.simpleName}"
+            )
+        }
+    }
+
+    /**
      * Build configuration for custom profiles.
      */
     private fun buildV2rayCustomConfig(configContext: CoreConfigContext): ConfigResult {

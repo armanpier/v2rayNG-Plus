@@ -39,6 +39,8 @@ sealed interface MainAction {
     data object TestCurrentServer : MainAction
     data object TestAllServers : MainAction
     data object TestRealAllServers : MainAction
+    data object TestRealAllServersSpeed : MainAction
+    data class TestServerSpeed(val guid: String) : MainAction
     data object CancelTesting : MainAction
     data object RemoveAllServers : MainAction
     data object RemoveDuplicateServers : MainAction

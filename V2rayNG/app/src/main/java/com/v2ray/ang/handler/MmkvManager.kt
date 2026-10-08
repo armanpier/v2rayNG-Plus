@@ -491,6 +491,21 @@ object MmkvManager {
     }
 
     /**
+     * Encodes the speed test result for a server configuration.
+     *
+     * @param guid The server GUID.
+     * @param speed The formatted speed test result (e.g. "12.5 MB/s").
+     */
+    fun encodeServerTestSpeed(guid: String, speed: String) {
+        if (guid.isBlank()) {
+            return
+        }
+        val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
+        aff.testSpeed = speed
+        serverAffStorage.encode(guid, JsonUtil.toJson(aff))
+    }
+
+    /**
      * Clears all test delay results.
      *
      * @param keys The list of server GUIDs.
@@ -499,6 +514,7 @@ object MmkvManager {
         keys?.forEach { key ->
             decodeServerAffiliationInfo(key)?.let { aff ->
                 aff.testDelayMillis = 0
+                aff.testSpeed = ""
                 serverAffStorage.encode(key, JsonUtil.toJson(aff))
             }
         }
