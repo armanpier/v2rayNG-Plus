@@ -350,7 +350,7 @@
     <string name="title_ping_all_server">Проверить TCP-задержку</string>
     <string name="title_real_ping_all_server">Проверить реальную задержку</string>
     <string name="title_real_speed_all_server">Проверить реальную скорость</string>
-    <string name="title_smart_speed_test">Умный тест скорости (топ 15)</string>
+    <string name="title_smart_speed_test">Умный тест скорости (топ 10)</string>
     <string name="title_speed_test">Тест скорости</string>
     <string name="title_stop_testing">Остановить тест</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>

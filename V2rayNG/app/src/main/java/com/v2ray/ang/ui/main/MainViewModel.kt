@@ -955,13 +955,7 @@ class MainViewModel(
     }
 
     fun testAllRealSpeed() {
-        cancelAllPing()
-        val groupId = uiState.value.selectedGroupId
-        val servers = currentServers()
-        if (servers.isEmpty()) {
-            return
-        }
-        startBulkSpeedTest(groupId, servers)
+        testSmartSpeed()
     }
 
     private fun startBulkSpeedTest(
@@ -1076,7 +1070,7 @@ class MainViewModel(
             val responsiveServers = currentGroupServers
                 .filter { it.testDelayMillis > 0L }
                 .sortedBy { it.testDelayMillis }
-                .take(15)
+                .take(10)
 
             if (responsiveServers.isNotEmpty()) {
                 currentSmartSpeedPhase = SmartSpeedPhase.SPEED_MEASUREMENT
@@ -1087,6 +1081,17 @@ class MainViewModel(
             }
         } else if (currentSmartSpeedPhase == SmartSpeedPhase.SPEED_MEASUREMENT) {
             currentSmartSpeedPhase = null
+            resetTestStatus()
+            viewModelScope.launch(ioDispatcher) {
+                try {
+                    sortBySpeedInternal()
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Auto sort by speed failed", e)
+                }
+                cacheMutex.withLock { groupDataCache.clear() }
+                setupGroupTab(forceRefresh = true).join()
+            }
+            return
         }
 
         resetTestStatus()

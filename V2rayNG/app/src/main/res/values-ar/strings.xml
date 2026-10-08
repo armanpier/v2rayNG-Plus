@@ -350,7 +350,7 @@
     <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
     <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي</string>
     <string name="title_real_speed_all_server">اختبار السرعة الفعلية</string>
-    <string name="title_smart_speed_test">اختبار السرعة الذكي (أفضل 15)</string>
+    <string name="title_smart_speed_test">اختبار السرعة الذكي (أفضل 10)</string>
     <string name="title_speed_test">اختبار السرعة</string>
     <string name="title_stop_testing">إيقاف الاختبار</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>

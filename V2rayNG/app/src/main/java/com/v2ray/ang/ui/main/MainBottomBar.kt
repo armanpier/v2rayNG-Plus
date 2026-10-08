@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 fun MainBottomBar(
     displayText: String,
     isRunning: Boolean,
+    isTesting: Boolean,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
 ) {
@@ -70,9 +71,9 @@ fun MainBottomBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp)
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 88.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = displayText,
@@ -82,6 +83,32 @@ fun MainBottomBar(
                     }
                 )
             }
+        }
+        FloatingActionButton(
+            onClick = {
+                if (isTesting) {
+                    onAction(MainAction.CancelTesting)
+                } else {
+                    onAction(MainAction.TestSmartSpeed)
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 24.dp)
+                .offset(y = (-28).dp)
+                .navigationBarsPadding(),
+            containerColor = if (isTesting) colorFabActive
+            else if (isDarkTheme) colorFabInactiveDark
+            else colorFabInactiveLight
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_speed_24dp),
+                contentDescription = stringResource(
+                    if (isTesting) R.string.action_cancel else R.string.title_speed_test
+                ),
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
         }
         FloatingActionButton(
             onClick = {

@@ -350,7 +350,7 @@
     <string name="title_ping_all_server">测试 TCP 延迟（TCPing）</string>
     <string name="title_real_ping_all_server">测试真连接延迟</string>
     <string name="title_real_speed_all_server">测试真连接速度</string>
-    <string name="title_smart_speed_test">智能测速 (前15个)</string>
+    <string name="title_smart_speed_test">智能测速 (前10个)</string>
     <string name="title_speed_test">测速</string>
     <string name="title_stop_testing">停止测试</string>
     <string name="title_user_asset_setting">资源文件</string>

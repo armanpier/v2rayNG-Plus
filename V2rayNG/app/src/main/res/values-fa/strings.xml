@@ -350,7 +350,7 @@
     <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تأخیر واقعی</string>
     <string name="title_real_speed_all_server">آزمایش سرعت واقعی</string>
-    <string name="title_smart_speed_test">تست سرعت هوشمند (۱۵ سرور برتر)</string>
+    <string name="title_smart_speed_test">تست سرعت هوشمند (۱۰ سرور برتر)</string>
     <string name="title_speed_test">آزمایش سرعت</string>
     <string name="title_stop_testing">توقف تست</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>

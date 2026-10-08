@@ -350,7 +350,7 @@
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
     <string name="title_real_ping_all_server">Test real delays</string>
     <string name="title_real_speed_all_server">Test real speeds</string>
-    <string name="title_smart_speed_test">Smart speed test (top 15)</string>
+    <string name="title_smart_speed_test">Smart speed test (top 10)</string>
     <string name="title_speed_test">Speed test</string>
     <string name="title_stop_testing">Stop testing</string>
     <string name="title_user_asset_setting">Asset files</string>

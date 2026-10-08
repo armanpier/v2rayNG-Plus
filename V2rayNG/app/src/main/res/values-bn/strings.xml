@@ -350,7 +350,7 @@
     <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
     <string name="title_real_ping_all_server">প্রকৃত বিলম্ব পরীক্ষা করুন</string>
     <string name="title_real_speed_all_server">প্রকৃত গতি পরীক্ষা করুন</string>
-    <string name="title_smart_speed_test">স্মার্ট স্পিড টেস্ট (শীর্ষ ১৫)</string>
+    <string name="title_smart_speed_test">স্মার্ট স্পিড টেস্ট (শীর্ষ ১০)</string>
     <string name="title_speed_test">গতি পরীক্ষা</string>
     <string name="title_stop_testing">টেস্টিং বন্ধ করুন</string>
     <string name="title_user_asset_setting">অ্যাসেট ফাইল</string>
